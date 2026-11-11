@@ -4,7 +4,7 @@ export const FoodAnalysisSchema = z.object({
   foods: z.array(
     z.object({
       name: z.string(),
-      wheight: z.number(),
+      weight: z.number(),
     })
   ),
 });
