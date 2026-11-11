@@ -44,8 +44,7 @@ export async function FoodRoutes(app: FastifyInstance) {
     };
   }>("/nutrients", (request, reply) => {
     const foods  = request.body.foods;
-
-    console.log("\x1b[32m", foods, "\x1b[0m");
+    
 
     return reply.code(200).send({message:"ok"})
   });
