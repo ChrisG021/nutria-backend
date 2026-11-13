@@ -1,5 +1,7 @@
 # Dependências
 node_modules/
+.npm/
+.cache/
 
 # Variáveis de ambiente
 .env
@@ -10,6 +12,8 @@ node_modules/
 dist/
 build/
 coverage/
+.nyc_output/
+.eslintcache
 *.tsbuildinfo
 src/generated/prisma/
 
