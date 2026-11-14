@@ -2,11 +2,14 @@ import { FastifyInstance } from "fastify";
 import { fileTypeFromBuffer } from "file-type";
 import { identifyFood } from "../services/gemini.service";
 import FoodService from "../services/foods.service";
+import { MealsService } from "../services/meals.service";
+import { MealType } from "../types";
 
 export async function FoodRoutes(app: FastifyInstance) {
   //Food routes with image analyzer and nutrients counter
   const service = new FoodService(app);
-  app.get("/all", async (request, reply) => {
+  const mealsServices = new MealsService(app);
+  app.get("/", async (request, reply) => {
     const result = await service.getFoods();
 
     return reply.code(200).send({ result });
@@ -68,11 +71,10 @@ export async function FoodRoutes(app: FastifyInstance) {
   }>("/nutrients", async (request, reply) => {
     const foods = request.body.foods;
     const result = await service.getNutrientsPerMeal(foods);
+    const meal = await mealsServices.setMeal("2f98d56b-2d5a-49b9-839a-bb8b25c8108e",MealType.DINNER,result)
 
     return reply.code(200).send({
-      meal: "Almoço",
-      foods: result,
-      uploadedAt: new Date().toISOString(),
+      meal
     });
   });
 }

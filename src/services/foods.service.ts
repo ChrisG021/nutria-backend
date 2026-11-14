@@ -1,10 +1,10 @@
 import { FastifyInstance } from "fastify";
 import { FoodAnalysis } from "../types";
 import { allFoods, getByCode, searchFoodByName } from "../repo/foods.repo";
-import { foods } from "../generated/prisma/client";
+import { meal_food } from "../generated/prisma/client";
 
 class FoodService {
-  constructor(private readonly app: FastifyInstance) {}
+  constructor(private readonly app: FastifyInstance) { }
 
   private async searchSimilarFood(food: string) {
     const candidate = await searchFoodByName(food);
@@ -20,7 +20,7 @@ class FoodService {
     return allFoods();
   }
 
-  public getFoodByCode(code:number) {
+  public getFoodByCode(code: number) {
     return getByCode(code);
   }
 
@@ -28,25 +28,25 @@ class FoodService {
     const results = await Promise.all(
       foods.map(async (food) => {
         const candidate = await this.searchSimilarFood(food.name);
-        if (!candidate) return;
-
-        const macroNutrients = {
-          calories: (Number(candidate.calories_kcal) * food.weight) / 100,
-          carbohydrates:
-            (Number(candidate.carbohydrates_g) * food.weight) / 100,
-          fats: (Number(candidate.fat_g) * food.weight) / 100,
-          proteins: (Number(candidate.protein_g) * food.weight) / 100,
-        };
+        if (!candidate) return undefined;
 
         return {
+          food_id: candidate.taco_code,
           name: candidate.name,
-          weight: food.weight,
-          macroNutrients,
+          weight_g: food.weight,
+          calories_kcal:
+            (Number(candidate.calories_kcal) * food.weight) / 100,
+          carbohydrates_g:
+            (Number(candidate.carbohydrates_g) * food.weight) / 100,
+          fat_g:
+            (Number(candidate.fat_g) * food.weight) / 100,
+          protein_g:
+            (Number(candidate.protein_g) * food.weight) / 100,
         };
       }),
     );
 
-    return results;
+    return results.filter((food) => food !== undefined);
   }
 }
 

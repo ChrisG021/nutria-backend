@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import fastifyCors from "@fastify/cors";
 import fastifyMultipart from "@fastify/multipart";
 import { FoodRoutes } from "./routes/foods.routes";
+import MealsRoutes from "./routes/meals.routes";
 
 //Initialized app with your depedencies,routes and settings
 export async function buildApp() {
@@ -26,6 +27,7 @@ export async function buildApp() {
 
   //++++++++++++++++++++ ROTAS ++++++++++++++++++++++
   app.register(FoodRoutes,{prefix:"foods"});
+  app.register(MealsRoutes,{prefix:"meals"});
 
   app.get("/health", async () => {
     return {
