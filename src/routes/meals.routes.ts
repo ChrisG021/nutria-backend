@@ -7,7 +7,23 @@ export default function MealsRoutes(app: FastifyInstance) {
     app.get<{ Params: { userid: string } }>("/:userid", async (request, reply) => {
         const userid = request.params.userid;
         const result = await service.getMeals(userid);
-        return reply.code(200).send({result});
+        return reply.code(200).send({ result });
     })
 
+    app.get<{ Params: { mealId: string } }>(
+        "/details/:mealId",
+        async (request, reply) => {
+            const { mealId } = request.params;
+
+            const meal = await service.getMealById(mealId);
+
+            if (!meal) {
+                return reply.code(404).send({
+                    message: "Refeição não encontrada.",
+                });
+            }
+
+            return reply.code(200).send({ result: meal });
+        }
+    );
 }

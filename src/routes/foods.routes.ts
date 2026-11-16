@@ -63,18 +63,26 @@ export async function FoodRoutes(app: FastifyInstance) {
 
   app.post<{
     Body: {
+      userId: string;
+      mealType: MealType;
       foods: {
         name: string;
         weight: number;
       }[];
     };
   }>("/nutrients", async (request, reply) => {
-    const foods = request.body.foods;
+    const { userId, mealType, foods } = request.body;
+
     const result = await service.getNutrientsPerMeal(foods);
-    const meal = await mealsServices.setMeal("2f98d56b-2d5a-49b9-839a-bb8b25c8108e",MealType.DINNER,result)
+
+    const meal = await mealsServices.setMeal(
+      userId,
+      mealType,
+      result
+    );
 
     return reply.code(200).send({
-      meal
+      meal,
     });
   });
 }

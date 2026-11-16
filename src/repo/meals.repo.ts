@@ -41,3 +41,14 @@ export async function allMeals(userId: string) {
     },
   });
 }
+
+export async function  findMeal(id:string){
+return prisma.meals.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        meal_food: true,
+      },
+    })
+}
