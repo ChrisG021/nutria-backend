@@ -1,5 +1,23 @@
+import { formatMealDate } from "../lib/meal-date";
 import { prisma } from "../lib/prisma";
-import { CreateMealFood, MealFood, MealType } from "../types";
+import { Prisma } from "../generated/prisma/client";
+import { CreateMealFood, MealType } from "../types";
+
+function addNutrients(total: Record<string, Prisma.InputJsonValue>, value: Prisma.JsonValue): void {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return;
+  for (const [key, item] of Object.entries(value)) {
+    if (typeof item === "number") {
+      total[key] = (typeof total[key] === "number" ? total[key] : 0) + item;
+    } else if (item && typeof item === "object" && !Array.isArray(item)) {
+      const nested: Record<string, Prisma.InputJsonValue> =
+        total[key] && typeof total[key] === "object" && !Array.isArray(total[key])
+          ? { ...total[key] as Record<string, Prisma.InputJsonValue> }
+          : {};
+      addNutrients(nested, item);
+      total[key] = nested;
+    }
+  }
+}
 
 
 export async function createMeal(
@@ -7,10 +25,19 @@ export async function createMeal(
   mealType: MealType,
   foods: CreateMealFood[]
 ) {
+  const nutrients: Record<string, Prisma.InputJsonValue> = {};
+  for (const food of foods) addNutrients(nutrients, food.nutrients);
   return prisma.meals.create({
     data: {
       user_id: userId,
+      created_at: formatMealDate(new Date()),
       meal_type: mealType,
+      calories_kcal: foods.reduce((sum, food) => sum + food.calories_kcal, 0),
+      carbohydrates_g: foods.reduce((sum, food) => sum + food.carbohydrates_g, 0),
+      protein_g: foods.reduce((sum, food) => sum + food.protein_g, 0),
+      fat_g: foods.reduce((sum, food) => sum + food.fat_g, 0),
+      fiber_g: foods.reduce((sum, food) => sum + food.fiber_g, 0),
+      nutrients,
 
       meal_food: {
         create: foods.map((food) => ({
@@ -21,6 +48,8 @@ export async function createMeal(
           carbohydrates_g: food.carbohydrates_g,
           protein_g: food.protein_g,
           fat_g: food.fat_g,
+          fiber_g: food.fiber_g,
+          nutrients: food.nutrients === null ? Prisma.JsonNull : food.nutrients,
         })),
       },
     },

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Prisma } from "../generated/prisma/client";
 
 export const FoodAnalysisSchema = z.object({
   foods: z.array(
@@ -19,6 +20,8 @@ export type MealFood = {
   carbohydrates_g: number;
   protein_g: number;
   fat_g: number;
+  fiber_g: number;
+  nutrients: Prisma.JsonValue;
 };
 
 export enum MealType {
@@ -38,4 +41,6 @@ export type CreateMealFood = Pick<
   | "carbohydrates_g"
   | "protein_g"
   | "fat_g"
+  | "fiber_g"
+  | "nutrients"
 >;

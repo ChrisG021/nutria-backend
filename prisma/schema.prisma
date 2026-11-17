@@ -28,7 +28,13 @@ model meals {
   id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id    String      @default(dbgenerated("auth.uid()")) @db.Uuid
   meal_type  String
-  created_at DateTime    @default(now()) @db.Timestamptz(6)
+  created_at String
+  calories_kcal Decimal @default(0) @db.Decimal
+  carbohydrates_g Decimal @default(0) @db.Decimal
+  protein_g Decimal @default(0) @db.Decimal
+  fat_g Decimal @default(0) @db.Decimal
+  fiber_g Decimal @default(0) @db.Decimal
+  nutrients Json @default("{}")
   meal_food  meal_food[]
   user       auth_users  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -45,6 +51,8 @@ model meal_food {
   carbohydrates_g Decimal @default(0) @db.Decimal
   protein_g       Decimal @default(0) @db.Decimal
   fat_g           Decimal @default(0) @db.Decimal
+  fiber_g         Decimal @default(0) @db.Decimal
+  nutrients       Json    @default("{}")
   name            String?
   food            foods   @relation(fields: [food_id], references: [taco_code], onDelete: NoAction, onUpdate: NoAction)
   meal            meals   @relation(fields: [meal_id], references: [id], onDelete: Cascade, onUpdate: NoAction)

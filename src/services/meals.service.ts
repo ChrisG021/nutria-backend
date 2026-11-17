@@ -2,6 +2,8 @@ import { FastifyInstance } from "fastify";
 import { allMeals, createMeal, findMeal } from "../repo/meals.repo";
 import { CreateMealFood, MealType } from "../types";
 
+export { formatMealDate } from "../lib/meal-date";
+
 export class MealsService {
   constructor(private readonly app: FastifyInstance) { }
 
@@ -9,16 +11,16 @@ export class MealsService {
     userId: string,
     mealType: MealType,
     data: CreateMealFood[]
-  ): Promise<Awaited<ReturnType<typeof createMeal>>> {
+  ) {
     return createMeal(userId, mealType, data);
   }
 
   public async getMeals(userId: string) {
-    return await allMeals(userId);
+    return allMeals(userId);
   }
 
   public async getMealById(mealId: string) {
-    return await findMeal(mealId); 
+    return findMeal(mealId);
   }
 
 }
