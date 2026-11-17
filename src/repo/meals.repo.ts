@@ -23,17 +23,29 @@ function addNutrients(total: Record<string, Prisma.InputJsonValue>, value: Prism
 export async function createMeal(
   userId: string,
   mealType: MealType,
-  foods: CreateMealFood[]
+  foods: CreateMealFood[],
 ) {
   const nutrients: Record<string, Prisma.InputJsonValue> = {};
-  for (const food of foods) addNutrients(nutrients, food.nutrients);
+
+  for (const food of foods) {
+    addNutrients(nutrients, food.nutrients);
+  }
+
   return prisma.meals.create({
     data: {
-      user_id: userId,
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+
       created_at: formatMealDate(new Date()),
       meal_type: mealType,
       calories_kcal: foods.reduce((sum, food) => sum + food.calories_kcal, 0),
-      carbohydrates_g: foods.reduce((sum, food) => sum + food.carbohydrates_g, 0),
+      carbohydrates_g: foods.reduce(
+        (sum, food) => sum + food.carbohydrates_g,
+        0,
+      ),
       protein_g: foods.reduce((sum, food) => sum + food.protein_g, 0),
       fat_g: foods.reduce((sum, food) => sum + food.fat_g, 0),
       fiber_g: foods.reduce((sum, food) => sum + food.fiber_g, 0),
@@ -61,7 +73,11 @@ export async function createMeal(
 }
 
 export async function allMeals(userId: string) {
-  return prisma.meals.findMany({
+  console.log("Testando conexão com o banco...");
+  await prisma.$queryRaw`SELECT 1`;
+  console.log("Conexão OK. Buscando refeições...");
+
+  const meals = await prisma.meals.findMany({
     where: {
       user_id: userId,
     },
@@ -69,6 +85,9 @@ export async function allMeals(userId: string) {
       meal_food: true,
     },
   });
+
+  console.log("Refeições carregadas:", meals.length);
+  return meals;
 }
 
 export async function  findMeal(id:string){

@@ -31,35 +31,35 @@ export async function FoodRoutes(app: FastifyInstance) {
     return reply.code(200).send({ result });
   });
 
-  app.post("/analyzer", async (request, reply) => {
-    const file = await request.file();
+  // app.post("/analyzer", async (request, reply) => {
+  //   const file = await request.file();
 
-    if (!file) {
-      return reply.code(400).send({
-        error: "No image uploaded",
-      });
-    }
-    const image = await file.toBuffer();
+  //   if (!file) {
+  //     return reply.code(400).send({
+  //       error: "No image uploaded",
+  //     });
+  //   }
+  //   const image = await file.toBuffer();
 
-    const detectedType = await fileTypeFromBuffer(image);
+  //   const detectedType = await fileTypeFromBuffer(image);
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  //   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
 
-    if (!detectedType || !allowedTypes.includes(detectedType.mime)) {
-      return reply.status(415).send({
-        error: "Unsupported file type",
-      });
-    }
+  //   if (!detectedType || !allowedTypes.includes(detectedType.mime)) {
+  //     return reply.status(415).send({
+  //       error: "Unsupported file type",
+  //     });
+  //   }
 
-    console.log("\x1b[32m", "IMAGEM ENVIADA PARA O GEMINI", "\x1b[0m");
-    const analysis = await identifyFood(image, detectedType.mime);
+  //   console.log("\x1b[32m", "IMAGEM ENVIADA PARA O GEMINI", "\x1b[0m");
+  //   const analysis = await identifyFood(image, detectedType.mime);
 
-    return {
-      message: "Image uploaded",
-      size: image.length,
-      analysis,
-    };
-  });
+  //   return {
+  //     message: "Image uploaded",
+  //     size: image.length,
+  //     analysis,
+  //   };
+  // });
 
   app.post<{
     Body: {
